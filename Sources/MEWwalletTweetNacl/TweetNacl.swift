@@ -80,11 +80,15 @@ public class TweetNacl {
       guard fromSecretKey.count == Constants.SecretKeyLength else { throw TweetNaclError.invalidSecretKey }
       sk = [UInt8](fromSecretKey)
     } else {
+        #if os(Linux)
+        sk = [UInt8].random(count: Constants.SecretKeyLength) //.base64
+        #else
         sk = [UInt8](repeating: 0, count: Constants.SecretKeyLength)
         let status = SecRandomCopyBytes(kSecRandomDefault, Constants.SecretKeyLength, &sk)
         guard status == errSecSuccess else {
             throw TweetNaclError.tweetNacl("Secure random bytes error")
         }
+        #endif
     }
           
     var pk = [UInt8](repeating: 0, count: Constants.PublicKeyLength)
@@ -195,11 +199,15 @@ public class TweetNacl {
   }
     
   private static func randomNonce() throws -> Data {
+    #if os(Linux)
+    var nonce = [UInt8].random(count: Constants.SecretBox.nonceLength) //.base64
+    #else
     var nonce = [UInt8](repeating: 0, count: Constants.SecretBox.nonceLength)
-    let status = SecRandomCopyBytes(kSecRandomDefault, Constants.SecretBox.nonceLength, &nonce)
-    guard status == errSecSuccess else {
+    let status = SecRandomCopyBytes(kSecRandomDefault, Constants.SecretBox.nonceLength, &nonce) // replace for Linux
+    guard status == errSecSuccess else { // replace for linux
       throw TweetNaclError.tweetNacl("Secure random bytes error")
     }
+    #endif
     return Data(nonce)
   }
 }
