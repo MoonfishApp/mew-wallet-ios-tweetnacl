@@ -81,7 +81,7 @@ public class TweetNacl {
       sk = [UInt8](fromSecretKey)
     } else {
         #if os(Linux)
-        sk = [UInt8].random(count: Constants.SecretKeyLength) //.base64
+        sk = [UInt8].random(count: Constants.SecretKeyLength)
         #else
         sk = [UInt8](repeating: 0, count: Constants.SecretKeyLength)
         let status = SecRandomCopyBytes(kSecRandomDefault, Constants.SecretKeyLength, &sk)
@@ -200,7 +200,7 @@ public class TweetNacl {
     
   private static func randomNonce() throws -> Data {
     #if os(Linux)
-    var nonce = [UInt8].random(count: Constants.SecretBox.nonceLength) //.base64
+    var nonce = [UInt8].random(count: Constants.SecretBox.nonceLength)
     #else
     var nonce = [UInt8](repeating: 0, count: Constants.SecretBox.nonceLength)
     let status = SecRandomCopyBytes(kSecRandomDefault, Constants.SecretBox.nonceLength, &nonce) // replace for Linux
@@ -239,12 +239,6 @@ extension Array where Element: FixedWidthInteger {
         var array: [Element] = .init(repeating: 0, count: count)
         (0..<count).forEach { array[$0] = Element.random() }
         return array
-    }
-}
-
-extension Array where Element == UInt8 {
-    public var base64: String {
-        self.base64String()
     }
 }
 #endif
